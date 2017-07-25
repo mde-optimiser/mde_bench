@@ -1,12 +1,10 @@
 FROM centos:centos7
 MAINTAINER The MDEO Project <alexandru.burdusel@kcl.ac.uk>
 
-RUN yum -y update; yum clean all
-RUN yum -y install
+RUN yum update -y && \
+yum install -y wget && \
+yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel && \
+yum clean all
 
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
-
-RUN chmod 755 /start.sh
-# EXPOSE 22
-RUN ./start.sh
-ENTRYPOINT ["/usr/sbin/sshd", "-D"]
+# Run app
+#ENTRYPOINT ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 10"]

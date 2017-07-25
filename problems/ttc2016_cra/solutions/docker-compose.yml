@@ -1,0 +1,36 @@
+version: '2'
+services:
+  mdeo_model_a:
+    environment:
+      - SOLUTION_OUTPUT
+    build:
+      context: ./mdeo
+    command: ["sh", "-c", "touch /var/app/output/test.txt"]
+    volumes:
+          - ./mdeo/app:/var/app/current
+          - ../experiments/experiment-$EXPERIMENT/mdeo/input-model-a/run-$RUN:/var/app/output/
+    restart: "no"
+  mdeo_model_b:
+    build:
+      context: ./mdeo
+    command: ["sh", "-c", "touch /var/app/output/test.txt"]
+    volumes:
+          - ./mdeo/app:/var/app/current
+          - ../experiments/experiment-$EXPERIMENT/mdeo/input-model-b/run-$RUN:/var/app/output/
+    restart: "no"
+  mdeo_model_b:
+    build:
+      context: ./mdeo
+    command: ["sh", "-c", "touch /var/app/output/test.txt"]
+    volumes:
+          - ./mdeo/app:/var/app/current
+          - ../experiments/experiment-$EXPERIMENT/mdeo/input-model-b/run-$RUN:/var/app/output/
+    restart: "no"
+  mdeo_model_b:
+    build:
+      context: ./mdeo
+    command: ["sh", "-c", "touch /var/app/output/test.txt"]
+    volumes:
+          - ./mdeo/app:/var/app/current
+          - ../experiments/experiment-$EXPERIMENT/mdeo/input-model-b/run-$RUN:/var/app/output/
+    restart: "no"

@@ -9,20 +9,6 @@ def get_directories(path)
       .select { |file| !File.file? file }
 end
 
-def get_solutions(solutionPath)
-  problems = get_directories(solutionPath)
-
-  for problem in problems
-
-    for solution in get_directories(File.join[solutionPath, problem])
-
-    end
-
-  end
-
-  return problems
-end
-
 # Some global config
 
 problems_path = "./problems"
@@ -31,7 +17,7 @@ problems_path = "./problems"
 # Get run id as unix timestamp
 run_id = Time.now.to_i
 
-experiments = 5
+experiments = 1
 problem = "ttc2016_cra"
 results_root = File.join(problems_path, problem, 'experiments', 'run-' + run_id.to_s)
 solutions_root = File.join(problems_path, problem, 'solutions')
@@ -47,6 +33,9 @@ containers = %x[cd problems/ttc2016_cra/solutions/ && docker-compose config --se
 
 # Build the containers
 system("cd problems/ttc2016_cra/solutions/ && docker-compose build")
+
+puts "Found the following container configurations: "
+puts containers
 
 # Run the experiments for each configuration
 for container in containers do

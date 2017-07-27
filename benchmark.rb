@@ -60,9 +60,13 @@ def evaluate_model(evaluation_jar, model_path)
 
   if status
 
-    # Check correctness
-    # not doing anything with this as it is expected to return only valid models from the solutions
-    correctness_names = /^(Correctness: )(ok)$/.match(stdout)
+    # Check correctness, if Correctness: ok not present it means the model is invalid
+    correctness = /^(Correctness: )(ok)$/.match(stdout)
+
+    # If the model is not valid, output no cra
+    if correctness == nil
+      return nil
+    end
 
     # Return its CRA value
     matches = /^(This makes a CRA-Index of: )(.*)$/.match(stdout)
@@ -104,7 +108,7 @@ for solution in solutions
 end
 
 # Save the results to CSV
-CSV.open(File.join(problems_path, problem, 'experiments', run_id.to_s + "-results.csv"), "wb") do |csv|
+CSV.open(File.join(problems_path, problem, 'experiments', "results-" + run_id.to_s + ".csv"), "wb") do |csv|
   for result in results
     csv << result
   end

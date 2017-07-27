@@ -1,17 +1,10 @@
 require 'docker'
 require 'date'
-
-# Load problems from problems directory
-
-def get_directories(path)
-  Dir.entries(path)
-      .reject{ |file| file =~ /^\.{1,2}$/}
-      .select { |file| !File.file? file }
-end
+require 'csv'
+require 'open3'
 
 # Some global config
-
-problems_path = "./problems"
+problems_path = "problems"
 
 # Experiment config
 # Get run id as unix timestamp
@@ -19,8 +12,9 @@ run_id = Time.now.to_i
 
 experiments = 1
 problem = "ttc2016_cra"
-results_root = File.join(problems_path, problem, 'experiments', 'run-' + run_id.to_s)
+results_root = File.join(problems_path, problem, 'experiments', 'experiment-' + run_id.to_s)
 solutions_root = File.join(problems_path, problem, 'solutions')
+evaluation_jar = File.join(problems_path, problem, "utilities/CRAIndexCalculator.jar")
 
 # General results path: run-{unixtime}/problem-{}/tool-{}/input-{}/experiment-{}/solution.xmi
 puts "Outputting results for this run to " + results_root
@@ -50,4 +44,63 @@ for container in containers do
 end
 
 # Delete the containers
-system("cd problems/ttc2016_cra/solutions/ && docker-compose down")
+# Insert blank envvars to avoid warning
+system({"EXPERIMENT" => "", "RUN" => ""}, "cd problems/ttc2016_cra/solutions/ && docker-compose down")
+
+# Process the results
+
+def get_directories(path)
+  Dir.entries(path)
+      .reject{ |file| file =~ /^\.{1,2}$/}
+      .select { |file| !File.file? file }
+end
+
+def evaluate_model(evaluation_jar, model_path)
+  stdout, stderr, status = Open3.capture3("java -jar " + evaluation_jar + " " + model_path)
+
+  if status
+
+    # Check correctness
+    # not doing anything with this as it is expected to return only valid models from the solutions
+    correctness_names = /^(Correctness: )(ok)$/.match(stdout)
+
+    # Return its CRA value
+    matches = /^(This makes a CRA-Index of: )(.*)$/.match(stdout)
+    return matches[2]
+
+  else
+    puts stderr
+  end
+
+end
+
+solutions = get_directories(results_root)
+results = [["tool","input","CRA-Index","time"]]
+
+for solution in solutions
+  models = get_directories(File.join(results_root, solution))
+
+  for model in models
+    model_runs = get_directories(File.join(results_root, solution, model))
+
+    for model_run in model_runs
+
+      model_run_path = File.join(results_root, solution, model, model_run)
+
+      Dir.glob(File.join(model_run_path, "*.xmi")) {|file|
+        # do something with the file here
+        cra_value = evaluate_model(evaluation_jar, file)
+
+        tool_info = /^([a-zA-Z0-9_-]+\/){4}([a-zA-Z0-9\-]+){1}(\/input-model-)([A-Z]){1}/.match(file)
+        run = [tool_info[2], tool_info[4], cra_value]
+        results.push(run)
+      }
+    end
+  end
+end
+
+CSV.open(File.join(problems_path, problem, 'experiments', run_id.to_s + "-results.csv"), "wb") do |csv|
+  for result in results
+    csv << result
+  end
+end

@@ -19,7 +19,7 @@
  The benchmark will be executed individually for each of the tools. The number of runs
  will be the same for all participants. The produced output for each of the runs will be added
  to the experiments folder, in the folder corresponding to the run, tool, model, and experiment number. The combined experiment
- results will be exported to a csv file created for that experiment.
+ results will be exported to a csv file created for that experiment. 
  
  * A tool is one of the tools participating in the benchmark.
  * A model is one of the CRA input models.
@@ -30,6 +30,9 @@
  Current output structure:
  
  experiment-{unixtime experiment id}/{tool name}/input-model-{input model}/run-{run number}/{solution}.xmi
+ 
+ The results csv file is compatible with this script created by Gabor Szarnyas: https://github.com/javitroya/TTC2016_Follow-up
+  
  
  ## Concerns
  

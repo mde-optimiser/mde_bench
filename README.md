@@ -33,11 +33,7 @@
  
  ## Concerns
  
- It would seem that there are still some issues with running docker consistently on IAAS hardware. I have not 
- encountered any issues in the past, but there are recent reports that the AWS infrastructure delays container
- startup after a certain number of restarts. Ref article here.
- 
- For the Excel solution i do not have an available Excel license to experiment with. I would like to ask the authors
+ For the Excel solution I don't have an available Excel license to experiment with. I would like to ask the authors
  to verify the terms of the excel license they are planning to use, to ensure that it can be used in the cloud and more
  specifically on AWS cloud.
  
@@ -53,12 +49,18 @@
  converted to a script that takes the required parameters. The command should terminate gracefully
  once the experiment is completed, and the output model file is correctly saved in the output directory.
  
- All solutions are to be added to the problem/ttc2016_cra/solutions/{solution_name} folder. In the root of your solution
- rolder add the Dockerfile. Next to the Dockerfile add another folder called app which should contain your application.
- Please create the {solution_name} directory in your pull request in the previously indicated
- path.
+ All solutions are to be added to the problem/ttc2016_cra/solutions/{operating system}/{solution_name} folder. 
+ Add your solution to the correct operating system path. For now I have added support for linux only, but windows will
+ be added shortly.
+ 
+ In the root of your solution folder add the Dockerfile. Next to the Dockerfile add another folder called app 
+ which should contain your application. Please create the {solution_name} directory and submit it as a pull request.
  
  ### Solution folder
+ 
+ Solutions are split based on the operating system they run on: windows or linux.
+ 
+ Add your solution to the correct stack path.
  
  In each solution directory you should ensure that your Dockerfile is added to the root.
  In that directory your compiled solution should be placed in a folder called app, next to the Dockerfile. 
@@ -67,3 +69,11 @@
  
  The solution should output for each individual run the produced model to the path /var/app/output
  which is mapped automaticaly to the corresponding experiment results folder.
+ 
+ ### Testing your solution
+ 
+ It is possible to test the solutions and the whole configuration using Vagrant and VirtualBox.
+ 
+ Once you have Vagrant and its requirements installed, run `vagrant up` from the infrastructure directory.
+ Once the virtual machine is created, run `vagrant ssh` from the same directory and run the benchmark ruby 
+ script from the /var/app/mde_bench directory.

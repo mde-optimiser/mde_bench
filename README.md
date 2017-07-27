@@ -16,18 +16,20 @@
  
  ## Assumptions
  
- The optimisation will be executed individually for each model for a number of runs, each run is called an experiment. The number of runs
- will be the same for all participants. The produced output for each of the experiments will be added
- to the experiments folder, in the folder corresponding to the run, tool, model, and experiment number.
+ The benchmark will be executed individually for each of the tools. The number of runs
+ will be the same for all participants. The produced output for each of the runs will be added
+ to the experiments folder, in the folder corresponding to the run, tool, model, and experiment number. The combined experiment
+ results will be exported to a csv file created for that experiment.
  
- * A run is an execution of all the tools.
  * A tool is one of the tools participating in the benchmark.
  * A model is one of the CRA input models.
- * An experiment number is the number of the experiment being ran for the tool with the corresponding model.
+ * A run is an execution of a single container.
+ * An experiment is an execution of all the tools and their corresponding runs.
+ * An experiment number is the id of the experiment being carried out.
  
  Current output structure:
  
- run-{unixtime}/problem-{problem name}/tool-{tool name}/input-{inout model}/experiment-{experiment number}/solution.xmi
+ experiment-{unixtime experiment id}/{tool name}/input-model-{input model}/run-{run number}/{solution}.xmi
  
  ## Concerns
  
@@ -51,14 +53,15 @@
  converted to a script that takes the required parameters. The command should terminate gracefully
  once the experiment is completed, and the output model file is correctly saved in the output directory.
  
- All solutions are to be added to the problem/ttc2016_cra/solutions/{solution_name} folder
+ All solutions are to be added to the problem/ttc2016_cra/solutions/{solution_name} folder. In the root of your solution
+ rolder add the Dockerfile. Next to the Dockerfile add another folder called app which should contain your application.
  Please create the {solution_name} directory in your pull request in the previously indicated
  path.
  
  ### Solution folder
  
- In each solution directory you should ensure that your Dockerfile is added to the root
- and that the solution root directory resides in the app directory next to the Dockerfile. 
+ In each solution directory you should ensure that your Dockerfile is added to the root.
+ In that directory your compiled solution should be placed in a folder called app, next to the Dockerfile. 
  The app directory will be mounted inside the container at the path /var/app/current. You 
  should not output any files to this directory, as it is shared between runs.
  

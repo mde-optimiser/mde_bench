@@ -39,8 +39,13 @@ puts containers
 
 # Run the experiments for each configuration
 for container in containers do
-  (0..experiments).each do |i|
+  (1..experiments).each do |i|
+    puts "========================================================="
+    puts "Running experiment " + i.to_s + " for container " + container
     system({"EXPERIMENT" => run_id.to_s, "RUN" => i.to_s}, "cd problems/ttc2016_cra/solutions/ && docker-compose run " + container)
+
+    puts "Container done"
+    puts "========================================================="
   end
 end
 

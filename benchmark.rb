@@ -10,7 +10,7 @@ problems_path = "problems"
 # Get run id as unix timestamp
 run_id = Time.now.to_i
 
-experiments = 1
+experiments = 3
 problem = "ttc2016_cra"
 results_root = File.join(problems_path, problem, 'experiments', 'experiment-' + run_id.to_s)
 solutions_root = File.join(problems_path, problem, 'solutions')

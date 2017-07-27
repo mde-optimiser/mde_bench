@@ -18,6 +18,10 @@ package{'ruby-devel':
     ensure => present,
 }
 
+package{'java-1.8.0-openjdk':
+    ensure => present,
+}
+
 ::bundler::install { '/var/app/mde_bench':
   user       => 'root',
   group      => 'root',

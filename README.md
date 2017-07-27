@@ -56,7 +56,7 @@
  In the root of your solution folder add the Dockerfile. Next to the Dockerfile add another folder called app 
  which should contain your application. Please create the {solution_name} directory and submit it as a pull request.
  
- ### Solution folder
+ ## Solution folder
  
  Solutions are split based on the operating system they run on: windows or linux.
  
@@ -70,7 +70,7 @@
  The solution should output for each individual run the produced model to the path /var/app/output
  which is mapped automaticaly to the corresponding experiment results folder.
  
- ### Testing your solution
+ ## Testing your solution
  
  It is possible to test the solutions and the whole configuration using Vagrant and VirtualBox.
  

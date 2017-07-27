@@ -77,6 +77,7 @@ end
 solutions = get_directories(results_root)
 results = [["tool","input","CRA-Index","time"]]
 
+# Iterate through the solutions, models and runs and add the row to CSV for each produced solution
 for solution in solutions
   models = get_directories(File.join(results_root, solution))
 
@@ -88,17 +89,21 @@ for solution in solutions
       model_run_path = File.join(results_root, solution, model, model_run)
 
       Dir.glob(File.join(model_run_path, "*.xmi")) {|file|
-        # do something with the file here
+
+        # Extract the CRA value from the evaluation artifact output
         cra_value = evaluate_model(evaluation_jar, file)
 
+        # Extract run information such as tool info, input model from the solution model path
         tool_info = /^([a-zA-Z0-9_-]+\/){4}([a-zA-Z0-9\-]+){1}(\/input-model-)([A-Z]){1}/.match(file)
         run = [tool_info[2], tool_info[4], cra_value]
         results.push(run)
       }
+
     end
   end
 end
 
+# Save the results to CSV
 CSV.open(File.join(problems_path, problem, 'experiments', run_id.to_s + "-results.csv"), "wb") do |csv|
   for result in results
     csv << result

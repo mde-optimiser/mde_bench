@@ -3,6 +3,13 @@ require 'date'
 require 'csv'
 require 'open3'
 
+if ARGV.length != 1 || !["linux", "windows"].include?(ARGV[0])
+  puts "Incorrect parameter found."
+  puts "Run script by specifying one of the stacks: windows or linux"
+end
+
+stack = ARGV[0]
+
 # Some global config
 problems_path = "problems"
 

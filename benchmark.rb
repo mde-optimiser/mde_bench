@@ -12,14 +12,6 @@ end
 
 stack = ARGV[0]
 
-
-#stdout, stderr, status = Open3.capture3({"RUN" => "envi-123"}, "echo %RUN%")
-#puts stdout
-#puts "---------------------------"
-#stdout, stderr, status = Open3.capture3({"RUN" => "envi-123"}, "powershell -command echo $env:RUN")
-#puts stdout
-#exit
-
 # Some global config
 problems_path = "problems"
 
@@ -31,7 +23,14 @@ experiments = 3
 problem = "ttc2016_cra"
 results_root = File.join(problems_path, problem, 'experiments', 'experiment-' + run_id.to_s)
 solutions_root = File.join(problems_path, problem, 'solutions/')
+experiments_root = File.join(problems_path, problem, 'experiments/')
 evaluation_jar = File.join(problems_path, problem, "utilities/CRAIndexCalculator.jar")
+command_shell = ""
+
+if stack == "windows"
+  command_shell = "powershell"
+end
+
 
 # General results path: run-{unixtime}/problem-{}/tool-{}/input-{}/experiment-{}/solution.xmi
 puts "Outputting results for this run to " + results_root
@@ -63,36 +62,42 @@ for container in containers do
     thing['services'].each do | service, value|
       value['volumes'].each do | volume |
 
-        host_volume_path = File.expand_path(File.join(solutions_root, stack, volume.split(":")[0]))
+        host_app_volume_path = File.expand_path(File.join(solutions_root, stack, volume.split(":")[0]))
+        host_experiment_volume_path = File.expand_path(File.join(experiments_root, stack, volume.split(":")[0]))
 
         if !volume.include? "experiments"
 
           # Check the service app directory exists
-          if !File.directory? host_volume_path
-            puts "Expected application directory does not exist: " + host_volume_path
+          if !File.directory? host_app_volume_path
+            puts "Expected application directory does not exist: " + host_app_volume_path
             puts "Check configuration for service: " + service
             exit
           end
-
-          puts "Skipping creation of volume path: " + host_volume_path
 
           next
         end
 
         #Only assumes relative paths before :
         # replace environment variables in config path
-        experiment_path = File.join(host_volume_path)
-
         environment_variables = {"$EXPERIMENT" => run_id.to_s, "$RUN" => i.to_s}
-        environment_variables.each {|k,v| experiment_path.sub!(k,v)}
+        environment_variables.each {|k,v| host_experiment_volume_path.sub!(k,v)}
 
-        puts "Creating experiment output path at: " + experiment_path
+        puts "Creating experiment output path at: " + host_experiment_volume_path
         # add some error handling
-        FileUtils.mkdir_p(experiment_path)
+        FileUtils.mkdir_p(host_experiment_volume_path)
       end
     end
 
-    Open3.capture3({"EXPERIMENT" => run_id.to_s, "RUN" => i.to_s}, "powershell cd problems/ttc2016_cra/solutions/" + stack +" && docker-compose run " + container)
+    stdout, stderr, status = Open3.capture3({"EXPERIMENT" => run_id.to_s, "RUN" => i.to_s}, command_shell +
+        " cd problems/ttc2016_cra/solutions/" + stack +" && docker-compose run " + container)
+
+    if stderr != ""
+      puts "Experiment command error:"
+      puts stdout
+      puts stderr
+      puts "Experiment output status: " + status.to_s
+    end
+
     puts "Container done"
     puts "========================================================="
   end
@@ -148,6 +153,8 @@ for solution in solutions
 
       model_run_path = File.join(results_root, solution, model, model_run)
 
+      run = []
+
       Dir.glob(File.join(model_run_path, "*.xmi")) {|file|
 
         # Extract the CRA value from the evaluation artifact output
@@ -156,15 +163,19 @@ for solution in solutions
         # Extract run information such as tool info, input model from the solution model path
         tool_info = /^([a-zA-Z0-9_-]+\/){4}([a-zA-Z0-9\-]+){1}(\/input-model-)([A-Z]){1}/.match(file)
         run = [tool_info[2], tool_info[4], cra_value]
-        results.push(run)
+
       }
 
+      time = File.readlines(File.join(model_run_path, "time.log")).sample(1).pop.strip
+      run.push(time)
+
+      results.push(run)
     end
   end
 end
 
 # Save the results to CSV
-CSV.open(File.join(problems_path, problem, 'experiments', "results-" + run_id.to_s + ".csv"), "wb") do |csv|
+CSV.open(File.join(problems_path, problem, 'experiments', "results-" + stack + "-" + run_id.to_s + ".csv"), "wb") do |csv|
   for result in results
     csv << result
   end

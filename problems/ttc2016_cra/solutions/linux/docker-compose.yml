@@ -5,40 +5,8 @@ services:
       - SOLUTION_OUTPUT
     build:
       context: ./mdeo
-    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 0 10 100 /var/app/output"]
+    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 0 10 100 /var/app/output && echo 123 > /var/app/output/time.log"]
     volumes:
           - ./mdeo/app:/var/app/current
           - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-A/run-$RUN:/var/app/output/
-    restart: "no"
-  mdeo_model_b:
-    build:
-      context: ./mdeo
-    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 1 10 100 /var/app/output"]
-    volumes:
-          - ./mdeo/app:/var/app/current
-          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-B/run-$RUN:/var/app/output/
-    restart: "no"
-  mdeo_model_c:
-    build:
-      context: ./mdeo
-    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 2 10 100 /var/app/output"]
-    volumes:
-          - ./mdeo/app:/var/app/current
-          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-C/run-$RUN:/var/app/output/
-    restart: "no"
-  mdeo_model_d:
-    build:
-      context: ./mdeo
-    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 3 10 100 /var/app/output"]
-    volumes:
-          - ./mdeo/app:/var/app/current
-          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-D/run-$RUN:/var/app/output/
-    restart: "no"
-  mdeo_model_e:
-    build:
-      context: ./mdeo
-    command: ["sh", "-c", "cd /var/app/current && java -jar mdeo.jar 1 4 10 100 /var/app/output"]
-    volumes:
-          - ./mdeo/app:/var/app/current
-          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-E/run-$RUN:/var/app/output/
     restart: "no"

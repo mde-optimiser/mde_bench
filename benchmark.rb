@@ -173,7 +173,7 @@ for solution in solutions
 
       time = File.readlines(File.join(model_run_path, "time.log")).sample(1).pop.strip
 
-      run.push(time.to_d)
+      run.push(time.to_i)
 
       results.push(run)
     end

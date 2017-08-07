@@ -74,11 +74,12 @@
  The solution should output for each individual run the produced model to the path /var/app/output
  which is mapped automatically to the corresponding experiment results folder.
  
+ Please refer to the mdeo solutions which have implementations for both the windows and linux stacks.
+ 
  ## Testing your solution
  
- 
  It is possible to test the solutions and the whole configuration using Vagrant and VirtualBox. We have
- two stacks thare are supported by our setup as detailed below.
+ two stacks that are are supported by our setup as detailed in the sections below.
  
  The benchmark script can be executed like this:
  
@@ -86,11 +87,21 @@
  
  In the command above stack can be one of windows or linux.
  
+ When running the benchmark script for the first time, it can take a while to download the docker images. Depending on
+ the images chosen, this may take  while. In the case of windows, the `windowsservercore` image is almost 5GB in size.
+ 
+ When bringing up vagrant you will be asked to chose a network adapter to which the VM will create a bridge. This is the
+ only configuration that I could get to work reliably with my setup. I assume that most will have DHCP in which case this
+ will work without a problem, otherwise, a different solution would have to be found depending on your specific setup.
+ 
  ### Linux
  
  Once you have Vagrant and its requirements installed, run `vagrant up` from the linux infrastructure directory.
  Once the virtual machine is created, run `vagrant ssh` from the same directory and run the benchmark ruby 
  script from the /var/app/mde_bench directory.
+ 
+ It is required that you change the user to root when running the script, otherwise the docker api is not visible
+ to the benchmark script. To do this, type `sudo su` in the terminal after which you can run the script without any issues.
  
  ### Windows
  
@@ -99,3 +110,8 @@
  Input > Keyboard > Insert CTRL+ALT+DEL then type the password `vagrant`.
  
  Once logged into the terminal of the windows VM, run the benchmark ruby script from the C:/var/app/mde_bench directory.
+ 
+ ## Notes
+ 
+ The setup has been tested on Linux and it works well end to end. The vagrant configuration should ensure that the same
+ results are obtained on windows as well, however this was not tested. Please let me know if there are any issues.

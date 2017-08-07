@@ -94,6 +94,11 @@
  only configuration that I could get to work reliably with my setup. I assume that most will have DHCP in which case this
  will work without a problem, otherwise, a different solution would have to be found depending on your specific setup.
  
+ The testing setup uses Vagrant to configure the virtual machine servers using the same scripts that would be used on
+ the testing boxes.
+ 
+ Information on how to install vagrant on your machine can be found here: https://www.vagrantup.com/docs/installation/
+ 
  ### Linux
  
  Once you have Vagrant and its requirements installed, run `vagrant up` from the linux infrastructure directory.

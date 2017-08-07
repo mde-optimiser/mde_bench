@@ -14,8 +14,3 @@ choco install git
 
 # Remove net nat to allow docker to create containers
 #Get-NetNat | Remove-NetNat
-
-# Hack for docker nat
-net stop hns;
-Remove-Netnat;
-net start hns;

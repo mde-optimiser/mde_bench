@@ -29,6 +29,9 @@ Vagrant.configure("2") do |config|
   # Install necessary tools to run the benchmarks
   config.vm.provision "shell", path: "scripts/install-runtime.ps1", run: "once"
 
+  # This fixes a docker networking issue
+  config.vm.provision "shell", path: "scripts/install-docker-nat-hack.ps1", run: "always"
+
   config.vm.provision :windows_reboot
 
 end

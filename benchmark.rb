@@ -25,11 +25,6 @@ results_root = File.join(problems_path, problem, 'experiments', 'experiment-' + 
 solutions_root = File.join(problems_path, problem, 'solutions/')
 experiments_root = File.join(problems_path, problem, 'experiments/')
 evaluation_jar = File.join(problems_path, problem, "utilities/CRAIndexCalculator.jar")
-command_shell = ""
-
-if stack == "windows"
-  command_shell = "powershell"
-end
 
 
 # General results path: run-{unixtime}/problem-{}/tool-{}/input-{}/experiment-{}/solution.xmi
@@ -40,14 +35,27 @@ puts "Loading current tools for problem " + problem
 
 # Run docker compose to get container configurations
 #containers = %x[cd problems/ttc2016_cra/solutions/linux/ && docker-compose config --services].split(/\n/)
-stdout, stderr, status = Open3.capture3("cd problems/ttc2016_cra/solutions/"+ stack + " && docker-compose config --services")
+stdout, stderr, status = Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "docker-compose config --services",
+                                        :chdir => "./problems/ttc2016_cra/solutions/"+ stack)
 containers = stdout.split(/\n/)
 
-# Build the containers
-stdout, stderr, status = Open3.capture3("cd problems/ttc2016_cra/solutions/linux/ && docker-compose build")
 
 puts "Found the following container configurations: "
 puts containers
+
+
+# Build the containers
+stdout, stderr, status = Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "docker-compose build",
+                                        :chdir => "./problems/ttc2016_cra/solutions/" + stack)
+
+puts "Building containers using configuration file: " + "./problems/ttc2016_cra/solutions/" + stack
+
+if stderr != ""
+  puts "Command error:"
+  puts stdout
+  puts stderr
+  puts "Output status: " + status.to_s
+end
 
 # Run the experiments for each configuration
 for container in containers do
@@ -59,37 +67,36 @@ for container in containers do
     # https://github.com/docker/compose/issues/2781
     thing = YAML.load_file(solutions_root + stack + "/docker-compose.yml")
 
-    thing['services'].each do | service, value|
-      value['volumes'].each do | volume |
+    thing['services'][container]['volumes'].each do | volume |
 
-        host_app_volume_path = File.expand_path(File.join(solutions_root, stack, volume.split(":")[0]))
-        host_experiment_volume_path = File.expand_path(File.join(experiments_root, stack, volume.split(":")[0]))
+      host_app_volume_path = File.expand_path(File.join(solutions_root, stack, volume.split(":")[0]))
+      host_experiment_volume_path = File.expand_path(File.join(experiments_root, stack, volume.split(":")[0]))
 
-        if !volume.include? "experiments"
+      if !volume.include? "experiments"
 
-          # Check the service app directory exists
-          if !File.directory? host_app_volume_path
-            puts "Expected application directory does not exist: " + host_app_volume_path
-            puts "Check configuration for service: " + service
-            exit
-          end
-
-          next
+        # Check the service app directory exists
+        if !File.directory? host_app_volume_path
+          puts "Expected application directory does not exist: " + host_app_volume_path
+          puts "Check configuration for service: " + service
+          exit
         end
 
-        #Only assumes relative paths before :
-        # replace environment variables in config path
-        environment_variables = {"$EXPERIMENT" => run_id.to_s, "$RUN" => i.to_s}
-        environment_variables.each {|k,v| host_experiment_volume_path.sub!(k,v)}
-
-        puts "Creating experiment output path at: " + host_experiment_volume_path
-        # add some error handling
-        FileUtils.mkdir_p(host_experiment_volume_path)
+        next
       end
+
+      #Only assumes relative paths before :
+      # replace environment variables in config path
+      environment_variables = {"$EXPERIMENT" => run_id.to_s, "$RUN" => i.to_s}
+      environment_variables.each {|k,v| host_experiment_volume_path.sub!(k,v)}
+
+      puts "Creating experiment output path at: " + host_experiment_volume_path
+      # add some error handling
+      FileUtils.mkdir_p(host_experiment_volume_path)
     end
 
-    stdout, stderr, status = Open3.capture3({"EXPERIMENT" => run_id.to_s, "RUN" => i.to_s}, command_shell +
-        " cd problems/ttc2016_cra/solutions/" + stack +" && docker-compose run " + container)
+    stdout, stderr, status = Open3.capture3({"EXPERIMENT" => run_id.to_s, "RUN" => i.to_s},
+                                            "docker-compose run " + container,
+                                            :chdir => "./problems/ttc2016_cra/solutions/" + stack)
 
     if stderr != ""
       puts "Experiment command error:"
@@ -105,8 +112,8 @@ end
 
 # Delete the containers
 # Insert blank envvars to avoid warning
-# system({"EXPERIMENT" => "", "RUN" => ""}, "cd problems/ttc2016_cra/solutions/linux/ && docker-compose down")
-Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "cd problems/ttc2016_cra/solutions/" + stack + "/ && docker-compose down")
+Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "docker-compose down",
+              :chdir => "./problems/ttc2016_cra/solutions/" + stack)
 
 # Process the results
 
@@ -167,7 +174,8 @@ for solution in solutions
       }
 
       time = File.readlines(File.join(model_run_path, "time.log")).sample(1).pop.strip
-      run.push(time)
+
+      run.push(time.to_i/1000000)
 
       results.push(run)
     end

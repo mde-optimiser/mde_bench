@@ -32,7 +32,8 @@
  experiment-{unixtime experiment id}/{tool name}/input-model-{input model}/run-{run number}/{solution}.xmi
  
  The results csv file is compatible with this script created by Gabor Szarnyas: https://github.com/javitroya/TTC2016_Follow-up
-  
+ 
+ Because there is no current agreement on time, I am assuming for now that the benchmark will use time measured in nanoseconds.
  
  ## Concerns
  
@@ -71,12 +72,30 @@
  should not output any files to this directory, as it is shared between runs.
  
  The solution should output for each individual run the produced model to the path /var/app/output
- which is mapped automaticaly to the corresponding experiment results folder.
+ which is mapped automatically to the corresponding experiment results folder.
  
  ## Testing your solution
  
- It is possible to test the solutions and the whole configuration using Vagrant and VirtualBox.
  
- Once you have Vagrant and its requirements installed, run `vagrant up` from the infrastructure directory.
+ It is possible to test the solutions and the whole configuration using Vagrant and VirtualBox. We have
+ two stacks thare are supported by our setup as detailed below.
+ 
+ The benchmark script can be executed like this:
+ 
+ `ruby benchmark.rb <stack>`
+ 
+ In the command above stack can be one of windows or linux.
+ 
+ ### Linux
+ 
+ Once you have Vagrant and its requirements installed, run `vagrant up` from the linux infrastructure directory.
  Once the virtual machine is created, run `vagrant ssh` from the same directory and run the benchmark ruby 
  script from the /var/app/mde_bench directory.
+ 
+ ### Windows
+ 
+ Once you have Vagrant and its requirements installed, run `vagrant up` from the linux infrastructure directory.
+ Once the virtual machine is created and provisioned with no errors, using the VirtualBox virtual machine gui menu 
+ Input > Keyboard > Insert CTRL+ALT+DEL then type the password `vagrant`.
+ 
+ Once logged into the terminal of the windows VM, run the benchmark ruby script from the C:/var/app/mde_bench directory.

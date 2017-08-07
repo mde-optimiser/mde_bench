@@ -1,12 +1,23 @@
 version: '2.1'
+
 services:
-  nmf_model_a:
+  mdeo_model_a:
     environment:
       - SOLUTION_OUTPUT
     build:
-      context: ./nmf
-    command: ["powershell", "Out-File -FilePath C:\\var\\app\\output\\EmptyFile2.txt"]
+      context: ./mdeo
+    command: ["powershell", "cd C:\\var\\app\\current; java -jar mdeo.jar 1 0 10 100 ./../output"]
     volumes:
-          - ./nmf/app:c:/var/app/current
+          - ./mdeo/app:c:/var/app/current
           - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-A/run-$RUN:C:/var/app/output/
+    restart: "no"
+  mdeo_model_b:
+    environment:
+      - SOLUTION_OUTPUT
+    build:
+      context: ./mdeo
+    command: ["powershell", "cd C:\\var\\app\\current; java -jar mdeo.jar 1 1 10 100 ./../output"]
+    volumes:
+          - ./mdeo/app:c:/var/app/current
+          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-B/run-$RUN:C:/var/app/output/
     restart: "no"

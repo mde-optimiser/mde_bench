@@ -8,11 +8,14 @@ Install-Package -Name docker -ProviderName DockerMsftProvider -Force
 
 # Install utilities
 choco install ruby
-#choco install docker
-choco install docker-compose --version 1.7.0
-#choco install docker-machine
+choco install docker-compose
 choco install javaruntime
 choco install git
 
-# Remove net nat
-Get-NetNat | Remove-NetNat
+# Remove net nat to allow docker to create containers
+#Get-NetNat | Remove-NetNat
+
+# Hack for docker nat
+net stop hns;
+Remove-Netnat;
+net start hns;

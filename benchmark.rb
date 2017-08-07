@@ -39,10 +39,8 @@ stdout, stderr, status = Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "dock
                                         :chdir => "./problems/ttc2016_cra/solutions/"+ stack)
 containers = stdout.split(/\n/)
 
-
 puts "Found the following container configurations: "
 puts containers
-
 
 # Build the containers
 stdout, stderr, status = Open3.capture3({"EXPERIMENT" => "", "RUN" => ""}, "docker-compose build",
@@ -175,7 +173,7 @@ for solution in solutions
 
       time = File.readlines(File.join(model_run_path, "time.log")).sample(1).pop.strip
 
-      run.push(time.to_i/1000000)
+      run.push(time.to_d)
 
       results.push(run)
     end

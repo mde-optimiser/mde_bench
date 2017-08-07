@@ -1,12 +1,12 @@
-version: '2'
+version: '2.1'
 services:
   nmf_model_a:
     environment:
       - SOLUTION_OUTPUT
     build:
       context: ./nmf
-    command: ["cmd", "echo hello"]
+    command: ["powershell", "Out-File -FilePath C:\\var\\app\\output\\EmptyFile2.txt"]
     volumes:
-          - ./nmf/app:/var/app/current
-          - ../experiments/experiment-$EXPERIMENT/nmf/input-model-A/run-$RUN:/var/app/output/
+          - ./nmf/app:c:/var/app/current
+          - ./../../experiments/experiment-$EXPERIMENT/mdeo/input-model-A/run-$RUN:C:/var/app/output/
     restart: "no"

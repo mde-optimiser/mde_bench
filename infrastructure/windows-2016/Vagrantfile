@@ -1,0 +1,27 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.communicator = "winrm"
+  config.vm.box = "jacqinthebox/windowsserver2016core"
+
+  #config.vm.network "forwarded_port", guest: 5985, host: 2985, id: "winrm"
+  config.vm.synced_folder ".", "C:/vagrant", disabled: false
+
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = "2048"
+    vb.cpus = 2
+  end
+
+  # Mount the working directory
+  config.vm.synced_folder "../../", "C:/var/app/mde_bench2"
+
+  # Install necessary tools to run the benchmarksvagrant up
+  config.vm.provision "shell", path: "scripts/install-tools.ps1", run: "once"
+
+  config.vm.provision "shell", path: "scripts/install-virtualboxga.ps1", run: "once"
+
+  # Install necessary tools to run the benchmarks
+  config.vm.provision "shell", path: "scripts/install-runtime.ps1", run: "once"
+
+
+end
